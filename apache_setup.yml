@@ -1,0 +1,27 @@
+---
+- name: setup apache
+  hosts: dev-servers
+  vars:
+    pkg_svc:
+      - httpd
+      - firewalld
+    rule: http
+  tasks:
+    - name: install {{ pkg_svc }} packages
+      yum:
+        name: "{{ item }}"
+        state: latest
+      loop: "{{ pkg_svc }}"
+
+    - name: start and enable {{ pkg_svc }} services
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+
+    - name: open {{ rule }} port
+      firewalld:
+        service: "{{ rule }}"
+        immediate: yes
+        permanent: true
+        state: enabled
